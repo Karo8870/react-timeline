@@ -1,6 +1,6 @@
-import { useTimelineContext } from '@/components/new-timeline/timeline-context';
+import { useTimelineContext } from '@/components/timeline/timeline-context';
 import { cn } from '@/lib/utils';
-import { CategoryRow } from '@/components/new-timeline/types';
+import { CategoryRow } from '@/components/timeline/types';
 
 function FirstLevelCategory({
   category,

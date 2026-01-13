@@ -1,11 +1,11 @@
-import { useCallback } from 'react';
-import { Key } from 'react';
-import { useTimelineContext } from '@/components/new-timeline/timeline-context';
+import { Key, useCallback } from 'react';
+import { useTimelineContext } from '@/components/timeline/timeline-context';
 import {
-  TimelineMouseEvent,
+  TimelineItemData,
   TimelineItemMouseEvent,
-  TimelineItemData
-} from '@/components/new-timeline/types';
+  TimelineMouseEvent
+} from '@/components/timeline/types';
+import { MouseEvent } from 'react';
 
 export function useRowKey() {
   const { rows } = useTimelineContext();
@@ -23,7 +23,10 @@ export function useRowKey() {
 }
 
 function useMouseHandlers<T>(
-  handleEvent: (e: React.MouseEvent<HTMLDivElement>, handler?: (e: T) => void) => void,
+  handleEvent: (
+    e: MouseEvent<HTMLDivElement>,
+    handler?: (e: T) => void
+  ) => void,
   handlers: {
     onMouseDown?: (e: T) => void;
     onMouseUp?: (e: T) => void;
@@ -44,25 +47,25 @@ function useMouseHandlers<T>(
     [handleEvent, stopPropagation]
   );
 
-  const handleMouseDown = useCallback(
-    createHandler(handlers.onMouseDown),
-    [createHandler, handlers.onMouseDown]
-  );
+  const handleMouseDown = useCallback(createHandler(handlers.onMouseDown), [
+    createHandler,
+    handlers.onMouseDown
+  ]);
 
-  const handleMouseUp = useCallback(
-    createHandler(handlers.onMouseUp),
-    [createHandler, handlers.onMouseUp]
-  );
+  const handleMouseUp = useCallback(createHandler(handlers.onMouseUp), [
+    createHandler,
+    handlers.onMouseUp
+  ]);
 
-  const handleMouseMove = useCallback(
-    createHandler(handlers.onMouseMove),
-    [createHandler, handlers.onMouseMove]
-  );
+  const handleMouseMove = useCallback(createHandler(handlers.onMouseMove), [
+    createHandler,
+    handlers.onMouseMove
+  ]);
 
-  const handleClick = useCallback(
-    createHandler(handlers.onClick),
-    [createHandler, handlers.onClick]
-  );
+  const handleClick = useCallback(createHandler(handlers.onClick), [
+    createHandler,
+    handlers.onClick
+  ]);
 
   return {
     onMouseDown: handleMouseDown,
@@ -167,14 +170,27 @@ export function useTimelineItemMouseEvents(
 
       handler(itemEvent);
     },
-    [columnWidth, cols, timelineWidth, rowHeight, item, itemIndex, getRowKey, itemRef, containerRef]
+    [
+      columnWidth,
+      cols,
+      timelineWidth,
+      rowHeight,
+      item,
+      itemIndex,
+      getRowKey,
+      itemRef,
+      containerRef
+    ]
   );
 
   return useMouseHandlers(handleMouseEvent, handlers, true);
 }
 
 function useTouchHandlers<T>(
-  handleEvent: (e: React.TouchEvent<HTMLDivElement>, handler?: (e: T) => void) => void,
+  handleEvent: (
+    e: React.TouchEvent<HTMLDivElement>,
+    handler?: (e: T) => void
+  ) => void,
   handlers: {
     onTouchStart?: (e: T) => void;
     onTouchEnd?: (e: T) => void;
@@ -198,20 +214,20 @@ function useTouchHandlers<T>(
     [handleEvent, stopPropagation, preventDefault]
   );
 
-  const handleTouchStart = useCallback(
-    createHandler(handlers.onTouchStart),
-    [createHandler, handlers.onTouchStart]
-  );
+  const handleTouchStart = useCallback(createHandler(handlers.onTouchStart), [
+    createHandler,
+    handlers.onTouchStart
+  ]);
 
-  const handleTouchEnd = useCallback(
-    createHandler(handlers.onTouchEnd),
-    [createHandler, handlers.onTouchEnd]
-  );
+  const handleTouchEnd = useCallback(createHandler(handlers.onTouchEnd), [
+    createHandler,
+    handlers.onTouchEnd
+  ]);
 
-  const handleTouchMove = useCallback(
-    createHandler(handlers.onTouchMove),
-    [createHandler, handlers.onTouchMove]
-  );
+  const handleTouchMove = useCallback(createHandler(handlers.onTouchMove), [
+    createHandler,
+    handlers.onTouchMove
+  ]);
 
   return {
     onTouchStart: handleTouchStart,
@@ -324,7 +340,17 @@ export function useTimelineItemTouchEvents(
         handler(itemEvent);
       }
     },
-    [columnWidth, cols, timelineWidth, rowHeight, item, itemIndex, getRowKey, itemRef, containerRef]
+    [
+      columnWidth,
+      cols,
+      timelineWidth,
+      rowHeight,
+      item,
+      itemIndex,
+      getRowKey,
+      itemRef,
+      containerRef
+    ]
   );
 
   return useTouchHandlers(handleTouchEvent, handlers, true, isDragging);

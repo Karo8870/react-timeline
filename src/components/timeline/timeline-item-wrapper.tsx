@@ -1,9 +1,9 @@
 import { useRef } from 'react';
-import { TimelineItemWrapperProps } from '@/components/new-timeline/types';
+import { TimelineItemWrapperProps } from '@/components/timeline/types';
 import {
   useTimelineItemMouseEvents,
   useTimelineItemTouchEvents
-} from '@/components/new-timeline/use-timeline-mouse-events';
+} from '@/components/timeline/use-timeline-mouse-events';
 
 export function TimelineItemWrapper({
   item,

@@ -25,12 +25,8 @@ export function useDrawGrid(
     const cellWidth = columnWidth;
     const cellHeight = rowHeight;
 
-    // Get border color from CSS variable for dark mode compatibility
     const root = document.documentElement;
-    const borderColor = getComputedStyle(root).getPropertyValue('--color-border').trim();
-    
-    // Convert oklch color to hex if needed, or use the value directly
-    // For now, use a simple approach: check if dark mode is active
+
     const isDark = root.classList.contains('dark');
     ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.1)' : '#e5e7eb';
     ctx.lineWidth = 1;

@@ -1,6 +1,6 @@
-import { useTimelineContext } from '@/components/new-timeline/timeline-context';
+import { useTimelineContext } from '@/components/timeline/timeline-context';
 import { useEffect, useRef, useCallback } from 'react';
-import { useDrawGrid } from '@/components/new-timeline/use-draw-grid';
+import { useDrawGrid } from '@/components/timeline/use-draw-grid';
 
 const ZOOM_CONFIG = {
   ROW_HEIGHT: { min: 44, max: 100 },

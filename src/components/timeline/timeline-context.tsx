@@ -1,9 +1,8 @@
 import { createContext, useContext, useState } from 'react';
 import {
-  ColumnRenderer,
   TimelineContextInterface,
   TimelineContextProviderProps
-} from '@/components/new-timeline/types';
+} from '@/components/timeline/types';
 
 const timelineContext = createContext<TimelineContextInterface | null>(null);
 

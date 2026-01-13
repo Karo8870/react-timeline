@@ -1,5 +1,5 @@
 import { Key } from 'react';
-import { CategoryRow, FlattenedItem } from '@/components/new-timeline/types';
+import { CategoryRow, FlattenedItem } from '@/components/timeline/types';
 
 export function flattenLevels(items: CategoryRow[]): FlattenedItem[][] {
   const levels: FlattenedItem[][] = [];

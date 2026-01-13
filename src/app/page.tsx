@@ -2,116 +2,18 @@
 
 import { useRef, useState } from 'react';
 import NewTimeline, {
-  TimelineItemComponentProps,
   TimelineItemData,
   TimelineItemMouseEvent,
-  TimelineItemWrapper,
   TimelineMouseEvent
-} from '@/components/new-timeline/new-timeline';
+} from '@/components/timeline/timeline';
 import { defaultCategories, defaultItems } from '@/lib/data';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { CreateItemDialog } from '@/components/create-item-dialog';
+import { EditItemDialog } from '@/components/edit-item-dialog';
+import { DefaultTimelineItem } from '@/components/timeline-items/default-timeline-item';
+import { PlaceholderItem } from '@/components/timeline-items/placeholder-item';
 
 function formatTime(hours: number, minutes: number = 0): string {
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-}
-
-function DefaultTimelineItem(props: TimelineItemComponentProps) {
-  const name = (props.item.data.name as string) || '';
-  const label = (props.item.data.label as string) || undefined;
-  const RESIZE_THRESHOLD_PX = 12; // pixels
-
-  // Check if there's an item above in the same group - if yes, don't render this one
-  const hasItemAbove = props.items?.some(
-    (otherItem, otherIndex) =>
-      otherIndex !== props.itemIndex &&
-      otherItem.group === props.item.group &&
-      otherItem.row === props.item.row - 1 &&
-      otherItem.x === props.item.x &&
-      otherItem.width === props.item.width
-  );
-
-  // If there's an item above, don't render this item (the top one will handle it)
-  if (hasItemAbove) {
-    return null;
-  }
-
-  // Count how many adjacent items are below this one in the same group
-  let adjacentCount = 1; // Start with this item
-  let currentRow = props.item.row;
-  while (true) {
-    const hasItemBelow = props.items?.some(
-      (otherItem) =>
-        otherItem.group === props.item.group &&
-        otherItem.row === currentRow + 1 &&
-        otherItem.x === props.item.x &&
-        otherItem.width === props.item.width
-    );
-    if (hasItemBelow) {
-      adjacentCount++;
-      currentRow++;
-    } else {
-      break;
-    }
-  }
-
-  // Calculate total height for all adjacent items
-  const totalHeight = props.pixelHeight * adjacentCount;
-
-  return (
-    <TimelineItemWrapper
-      {...props}
-      className='flex flex-col items-start overflow-hidden rounded-md border-2 border-primary bg-primary/20 px-2 text-foreground'
-      style={{ height: totalHeight }}
-    >
-      <div
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          width: `${RESIZE_THRESHOLD_PX}px`,
-          height: '100%',
-          cursor: 'w-resize',
-          zIndex: 10
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          right: 0,
-          top: 0,
-          width: `${RESIZE_THRESHOLD_PX}px`,
-          height: '100%',
-          cursor: 'e-resize',
-          zIndex: 10
-        }}
-      />
-      <span className='line-clamp-1 truncate text-sm'>{name}</span>
-      {label && (
-        <span className='line-clamp-1 min-w-max truncate text-sm'>{label}</span>
-      )}
-    </TimelineItemWrapper>
-  );
-}
-
-function PlaceholderItem(props: TimelineItemComponentProps) {
-  return (
-    <TimelineItemWrapper
-      {...props}
-      className='flex items-center justify-center overflow-hidden rounded-md border-2 border-dashed border-muted-foreground/50 bg-muted/50 px-2 opacity-50'
-    >
-      <span className='text-sm text-muted-foreground'>Placeholder</span>
-    </TimelineItemWrapper>
-  );
 }
 
 export default function Home() {
@@ -210,19 +112,15 @@ export default function Home() {
       const draggedItem = newItems[dragState.itemIndex];
       const groupId = draggedItem.group;
 
-      // Update all items in the same group
       newItems.forEach((item, index) => {
         if (item.group === groupId) {
           if (index === dragState.itemIndex) {
-            // Update dragged item with both x and row
             newItems[index] = {
               ...item,
               x: newX,
               row: newRow
             };
           } else {
-            // Update other items in group: only x position (horizontal movement affects all)
-            // Row stays the same for other items (vertical movement only affects dragged item)
             newItems[index] = {
               ...item,
               x: newX
@@ -254,7 +152,6 @@ export default function Home() {
           newWidth = snapPosition(newWidth);
         }
 
-        // Update all items in the same group with the new width
         newItems.forEach((item, index) => {
           if (item.group === groupId) {
             newItems[index] = {
@@ -264,7 +161,6 @@ export default function Home() {
           }
         });
       } else {
-        // Resize from left edge
         let newX = resizeState.originalX + deltaPosition;
         let newWidth = resizeState.originalWidth - deltaPosition;
 
@@ -306,7 +202,6 @@ export default function Home() {
           newWidth = snapPosition(newWidth);
         }
 
-        // Update all items in the same group with the new x and width
         newItems.forEach((item, index) => {
           if (item.group === groupId) {
             newItems[index] = {
@@ -414,11 +309,9 @@ export default function Home() {
   const handleCreateItem = () => {
     if (!createItemData || !newItemName.trim()) return;
 
-    // Find the maximum group ID and add 1 for the new items
     const maxGroup = Math.max(...items.map((item) => Number(item.group)), -1);
     const newGroup = maxGroup + 1;
 
-    // Snap the position if snap is enabled
     const snappedPosition = snap
       ? snapPosition(createItemData.position)
       : createItemData.position;
@@ -427,7 +320,6 @@ export default function Home() {
     const itemCount = Math.max(1, Math.floor(newItemCount));
     const newItems: TimelineItemData[] = [];
 
-    // Create multiple items in the same group, placed on consecutive rows
     for (let i = 0; i < itemCount; i++) {
       newItems.push({
         type: 'default',
@@ -465,7 +357,6 @@ export default function Home() {
       const itemToUpdate = newItems[editingItem.itemIndex];
       const groupId = itemToUpdate.group;
 
-      // Update all items in the same group with the new width and data
       newItems.forEach((item, index) => {
         if (item.group === groupId) {
           newItems[index] = {
@@ -497,7 +388,6 @@ export default function Home() {
       const itemToDelete = prevItems[editingItem.itemIndex];
       const groupId = itemToDelete.group;
 
-      // Delete all items in the same group
       return prevItems.filter((item) => item.group !== groupId);
     });
 
@@ -614,11 +504,9 @@ export default function Home() {
     setEditItemLabel((actualItem.data.label as string) || '');
     setEditItemWidth(actualItem.width);
     setIsEditDialogOpen(true);
-  }
+  };
 
   const handleItemMouseUp = (e: TimelineItemMouseEvent) => {
-    
-
     if (dragStateRef.current) {
       dragStateRef.current = null;
       updateScrollLock(false);
@@ -628,7 +516,7 @@ export default function Home() {
       updateScrollLock(false);
     }
 
-    updateItem(e); 
+    updateItem(e);
   };
 
   const handleItemClick = (e: TimelineItemMouseEvent) => {};
@@ -653,11 +541,9 @@ export default function Home() {
     const isNearRightEdge =
       pixelPosition > itemRect.width - RESIZE_THRESHOLD_PX;
 
-    // Find the actual item that was clicked (might be a bottom item in a merged group)
     let actualItemIndex = e.itemIndex;
     let actualItem = e.item;
 
-    // If the clicked row is different from the rendered item's row, find the correct item
     if (e.rowIndex !== e.item.row) {
       const clickedItem = items.find(
         (item, index) =>
@@ -679,7 +565,6 @@ export default function Home() {
     }
 
     if (isNearLeftEdge || isNearRightEdge) {
-      // Start resize immediately for touch
       resizeStateRef.current = {
         itemIndex: actualItemIndex,
         edge: isNearLeftEdge ? 'left' : 'right',
@@ -821,7 +706,7 @@ export default function Home() {
   };
 
   return (
-    <main className=''>
+    <main>
       <NewTimeline
         cols={cols}
         columnWidth={columnWidth}
@@ -852,131 +737,37 @@ export default function Home() {
         }}
         items={items}
       />
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create New Item</DialogTitle>
-            <DialogDescription>
-              Create a new timeline item at position{' '}
-              {createItemData?.position.toFixed(0)} on row{' '}
-              {createItemData?.rowIndex}
-            </DialogDescription>
-          </DialogHeader>
-          <div className='grid gap-4 py-4'>
-            <div className='grid gap-2'>
-              <Label htmlFor='name'>Name</Label>
-              <Input
-                id='name'
-                value={newItemName}
-                onChange={(e) => setNewItemName(e.target.value)}
-                placeholder='Item name'
-                autoFocus
-              />
-            </div>
-            <div className='grid gap-2'>
-              <Label htmlFor='label'>Label (optional)</Label>
-              <Input
-                id='label'
-                value={newItemLabel}
-                onChange={(e) => setNewItemLabel(e.target.value)}
-                placeholder='Item label'
-              />
-            </div>
-            <div className='grid gap-2'>
-              <Label htmlFor='width'>Width</Label>
-              <Input
-                id='width'
-                type='number'
-                value={newItemWidth}
-                onChange={(e) => setNewItemWidth(Number(e.target.value))}
-                min={minItemWidth}
-                max={maxItemWidth}
-              />
-            </div>
-            <div className='grid gap-2'>
-              <Label htmlFor='count'>Number of items in group</Label>
-              <Input
-                id='count'
-                type='number'
-                value={newItemCount}
-                onChange={(e) =>
-                  setNewItemCount(
-                    Math.max(1, Math.floor(Number(e.target.value) || 1))
-                  )
-                }
-                min={1}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant='outline'
-              onClick={() => setIsCreateDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleCreateItem} disabled={!newItemName.trim()}>
-              Create
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Item</DialogTitle>
-            <DialogDescription>
-              Edit or delete the timeline item
-            </DialogDescription>
-          </DialogHeader>
-          <div className='grid gap-4 py-4'>
-            <div className='grid gap-2'>
-              <Label htmlFor='edit-name'>Name</Label>
-              <Input
-                id='edit-name'
-                value={editItemName}
-                onChange={(e) => setEditItemName(e.target.value)}
-                placeholder='Item name'
-                autoFocus
-              />
-            </div>
-            <div className='grid gap-2'>
-              <Label htmlFor='edit-label'>Label (optional)</Label>
-              <Input
-                id='edit-label'
-                value={editItemLabel}
-                onChange={(e) => setEditItemLabel(e.target.value)}
-                placeholder='Item label'
-              />
-            </div>
-            <div className='grid gap-2'>
-              <Label htmlFor='edit-width'>Width</Label>
-              <Input
-                id='edit-width'
-                type='number'
-                value={editItemWidth}
-                onChange={(e) => setEditItemWidth(Number(e.target.value))}
-                min={minItemWidth}
-                max={maxItemWidth}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant='destructive' onClick={handleDeleteItem}>
-              Delete
-            </Button>
-            <Button
-              variant='outline'
-              onClick={() => setIsEditDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleUpdateItem} disabled={!editItemName.trim()}>
-              Save
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <CreateItemDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        createItemData={createItemData}
+        newItemName={newItemName}
+        onNewItemNameChange={setNewItemName}
+        newItemLabel={newItemLabel}
+        onNewItemLabelChange={setNewItemLabel}
+        newItemWidth={newItemWidth}
+        onNewItemWidthChange={setNewItemWidth}
+        newItemCount={newItemCount}
+        onNewItemCountChange={setNewItemCount}
+        minItemWidth={minItemWidth}
+        maxItemWidth={maxItemWidth}
+        onCreateItem={handleCreateItem}
+      />
+      <EditItemDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        editingItem={editingItem}
+        editItemName={editItemName}
+        onEditItemNameChange={setEditItemName}
+        editItemLabel={editItemLabel}
+        onEditItemLabelChange={setEditItemLabel}
+        editItemWidth={editItemWidth}
+        onEditItemWidthChange={setEditItemWidth}
+        minItemWidth={minItemWidth}
+        maxItemWidth={maxItemWidth}
+        onUpdateItem={handleUpdateItem}
+        onDeleteItem={handleDeleteItem}
+      />
     </main>
   );
 }

@@ -1,15 +1,15 @@
-import TimelineBackground from '@/components/new-timeline/timeline-background';
-import { useTimelineContext } from '@/components/new-timeline/timeline-context';
+import TimelineBackground from '@/components/timeline/timeline-background';
+import { useTimelineContext } from '@/components/timeline/timeline-context';
 import { useRef } from 'react';
 import { ComponentType } from 'react';
-import { useTimelineMouseEvents, useTimelineTouchEvents } from '@/components/new-timeline/use-timeline-mouse-events';
+import { useTimelineMouseEvents, useTimelineTouchEvents } from '@/components/timeline/use-timeline-mouse-events';
 import {
   TimelineItemData,
   TimelineItemComponentProps,
   TimelineMouseEvent,
   TimelineItemMouseEvent,
   TimelineContentProps
-} from '@/components/new-timeline/types';
+} from '@/components/timeline/types';
 
 export type {
   TimelineItemData,

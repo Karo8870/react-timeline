@@ -1,4 +1,4 @@
-import { useTimelineContext } from '@/components/new-timeline/timeline-context';
+import { useTimelineContext } from '@/components/timeline/timeline-context';
 import { ReactNode } from 'react';
 
 function TimelineColumn({

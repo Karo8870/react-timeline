@@ -1,15 +1,15 @@
-import { TimelineContextProvider } from '@/components/new-timeline/timeline-context';
-import { flattenLevels } from '@/components/new-timeline/flatten-levels';
-import { TimelineSidebar } from '@/components/new-timeline/timeline-sidebar';
-import TimelineHeader from '@/components/new-timeline/timeline-header';
-import TimelineContent from '@/components/new-timeline/timeline-content';
+import { TimelineContextProvider } from '@/components/timeline/timeline-context';
+import { flattenLevels } from '@/components/timeline/flatten-levels';
+import { TimelineSidebar } from '@/components/timeline/timeline-sidebar';
+import TimelineHeader from '@/components/timeline/timeline-header';
+import TimelineContent from '@/components/timeline/timeline-content';
 import {
   TimelineItemData,
   TimelineMouseEvent,
   TimelineItemMouseEvent,
   TimelineItemComponentProps,
   TimelineProps
-} from '@/components/new-timeline/types';
+} from '@/components/timeline/types';
 
 export type {
   TimelineMouseEvent,
@@ -18,7 +18,7 @@ export type {
   TimelineItemComponentProps
 };
 
-export { TimelineItemWrapper } from '@/components/new-timeline/timeline-item-wrapper';
+export { TimelineItemWrapper } from '@/components/timeline/timeline-item-wrapper';
 
 export default function Timeline(props: TimelineProps) {
   const rows = flattenLevels(props.categories);
