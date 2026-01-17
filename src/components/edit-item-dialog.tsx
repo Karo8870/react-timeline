@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { TimelineItemData } from '@/components/timeline/types';
+import { UseTimelineItemsReturn } from '@/components/timeline/use-timeline-items';
 
 interface EditItemDialogProps {
   open: boolean;
@@ -18,33 +20,57 @@ interface EditItemDialogProps {
     itemIndex: number;
     item: TimelineItemData;
   } | null;
-  editItemName: string;
-  onEditItemNameChange: (value: string) => void;
-  editItemLabel: string;
-  onEditItemLabelChange: (value: string) => void;
-  editItemWidth: number;
-  onEditItemWidthChange: (value: number) => void;
+  timelineItems: UseTimelineItemsReturn;
   minItemWidth: number;
   maxItemWidth: number;
-  onUpdateItem: () => void;
-  onDeleteItem: () => void;
 }
 
 export function EditItemDialog({
   open,
   onOpenChange,
   editingItem,
-  editItemName,
-  onEditItemNameChange,
-  editItemLabel,
-  onEditItemLabelChange,
-  editItemWidth,
-  onEditItemWidthChange,
+  timelineItems,
   minItemWidth,
-  maxItemWidth,
-  onUpdateItem,
-  onDeleteItem
+  maxItemWidth
 }: EditItemDialogProps) {
+  const [editItemName, setEditItemName] = useState('');
+  const [editItemLabel, setEditItemLabel] = useState('');
+  const [editItemWidth, setEditItemWidth] = useState(200);
+
+  useEffect(() => {
+    if (open && editingItem) {
+      setEditItemName((editingItem.item.data.name as string) || '');
+      setEditItemLabel((editingItem.item.data.label as string) || '');
+      setEditItemWidth(editingItem.item.width);
+    }
+  }, [open, editingItem]);
+
+  const handleUpdate = () => {
+    if (!editingItem) return;
+
+    timelineItems.updateItem(editingItem.itemIndex, {
+      width: editItemWidth,
+      data: {
+        ...editingItem.item.data,
+        name: editItemName.trim(),
+        label: editItemLabel.trim() || undefined
+      }
+    });
+
+    onOpenChange(false);
+  };
+
+  const handleDelete = () => {
+    if (!editingItem) return;
+
+    const itemToDelete = timelineItems.items[editingItem.itemIndex];
+    if (itemToDelete) {
+      timelineItems.deleteItemGroup(itemToDelete.group);
+    }
+
+    onOpenChange(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -60,7 +86,7 @@ export function EditItemDialog({
             <Input
               id='edit-name'
               value={editItemName}
-              onChange={(e) => onEditItemNameChange(e.target.value)}
+              onChange={(e) => setEditItemName(e.target.value)}
               placeholder='Item name'
               autoFocus
             />
@@ -70,7 +96,7 @@ export function EditItemDialog({
             <Input
               id='edit-label'
               value={editItemLabel}
-              onChange={(e) => onEditItemLabelChange(e.target.value)}
+              onChange={(e) => setEditItemLabel(e.target.value)}
               placeholder='Item label'
             />
           </div>
@@ -80,20 +106,20 @@ export function EditItemDialog({
               id='edit-width'
               type='number'
               value={editItemWidth}
-              onChange={(e) => onEditItemWidthChange(Number(e.target.value))}
+              onChange={(e) => setEditItemWidth(Number(e.target.value))}
               min={minItemWidth}
               max={maxItemWidth}
             />
           </div>
         </div>
         <DialogFooter>
-          <Button variant='destructive' onClick={onDeleteItem}>
+          <Button variant='destructive' onClick={handleDelete}>
             Delete
           </Button>
           <Button variant='outline' onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={onUpdateItem} disabled={!editItemName.trim()}>
+          <Button onClick={handleUpdate} disabled={!editItemName.trim()}>
             Save
           </Button>
         </DialogFooter>

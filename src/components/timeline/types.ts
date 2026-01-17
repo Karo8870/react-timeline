@@ -122,6 +122,15 @@ export interface TimelineContextProviderProps {
 // Main Component Props
 // ============================================================================
 
+export interface DragOptions {
+  enabled?: boolean;
+}
+
+export interface ResizeOptions {
+  enabled?: boolean;
+  threshold?: number;
+}
+
 export interface TimelineProps extends TimelineEventHandlers, TimelineItemEventHandlers {
   categories: CategoryRow[];
   cols: number;
@@ -129,6 +138,12 @@ export interface TimelineProps extends TimelineEventHandlers, TimelineItemEventH
   columnWidth?: number;
   items?: TimelineItemData[];
   itemComponents?: Record<string, ComponentType<TimelineItemComponentProps>>;
+  snap?: number;
+  minItemWidth?: number;
+  maxItemWidth?: number;
+  drag?: DragOptions;
+  resize?: ResizeOptions;
+  onItemsChange?: (items: TimelineItemData[]) => void;
 }
 
 export interface TimelineContentProps extends TimelineEventHandlers, TimelineItemEventHandlers {
