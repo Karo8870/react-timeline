@@ -1,25 +1,26 @@
 import { useTimelineContext } from '@/components/timeline/timeline-context';
 import { cn } from '@/lib/utils';
-import { CategoryRow } from '@/components/timeline/types';
+import { TimelineSidebarRowProps } from '@/components/timeline/types';
+import { ComponentType } from 'react';
 
-function FirstLevelCategory({
+export function DefaultSidebarRow({
   category,
+  level,
   currentIndex
-}: {
-  category: CategoryRow;
-  currentIndex: number;
-}) {
+}: TimelineSidebarRowProps) {
   const { rowHeight } = useTimelineContext();
 
-  return (
+  const height =
+    category.children === undefined || category.children.length === 0
+      ? `${rowHeight}px`
+      : `${rowHeight * category.children.length}px`;
+
+  if (level === 0) {
+    return (
       <div
         style={{
           writingMode: 'vertical-rl',
-          textOrientation: 'mixed',
-          height:
-            category.children === undefined || category.children.length === 0
-              ? `${rowHeight}px`
-              : `${rowHeight * category.children.length}px`
+          textOrientation: 'mixed'
         }}
         className={cn(
           'border-r border-border py-1 text-center min-w-max text-foreground',
@@ -28,70 +29,50 @@ function FirstLevelCategory({
       >
         {category.name}
       </div>
-  );
-}
-
-function SecondLevelCategory({
-  category,
-  currentIndex
-}: {
-  category: CategoryRow;
-  currentIndex: number;
-}) {
-  const { rowHeight } = useTimelineContext();
-
-  return (
-    <div>
+    );
+  } else {
+    return (
       <div
-      style={{
-        height:
-          category.children === undefined || category.children.length === 0
-            ? `${rowHeight}px`
-            : `${rowHeight * category.children.length}px`
-      }}
-      className={cn(
-        'border-r border-border text-center min-w-max text-foreground',
-        currentIndex !== 0 && 'border-t'
-      )}
-    >
-      {category.name}
-    </div>
-    </div>
-  );
+        className={cn(
+          'border-r border-border text-center min-w-max text-foreground',
+          currentIndex !== 0 && 'border-t'
+        )}
+      >
+        {category.name}
+      </div>
+    );
+  }
 }
 
-export function TimelineSidebar() {
-  const { rows } = useTimelineContext();
+export function TimelineSidebar({
+  sidebarRowComponent: SidebarRowComponent = DefaultSidebarRow
+}: {
+  sidebarRowComponent?: ComponentType<TimelineSidebarRowProps>;
+}) {
+  const { rows, rowHeight } = useTimelineContext();
 
   return (
     <div className='sticky left-0 z-10 flex border-border bg-card min-w-max'>
-      {rows.map((level, index) => {
-        if (index === 0) {
-          return (
-            <div key={index} className='flex flex-col'>
-              {level.map((category, categoryIndex) => (
-                <FirstLevelCategory
-                  key={category.key}
+      {rows.map((level, levelIndex) => (
+        <div key={levelIndex} className='flex flex-col min-w-max'>
+          {level.map((category, categoryIndex) => {
+            const height =
+              category.children === undefined || category.children.length === 0
+                ? rowHeight
+                : rowHeight * category.children.length;
+
+            return (
+              <div key={category.key} style={{ height: `${height}px` }}>
+                <SidebarRowComponent
                   category={category}
+                  level={levelIndex}
                   currentIndex={categoryIndex}
                 />
-              ))}
-            </div>
-          );
-        } else {
-          return (
-            <div key={index} className='flex flex-col min-w-max'>
-              {level.map((category, categoryIndex) => (
-                <SecondLevelCategory
-                  key={category.key}
-                  category={category}
-                  currentIndex={categoryIndex}
-                />
-              ))}
-            </div>
-          );
-        }
-      })}
+              </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }

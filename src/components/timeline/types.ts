@@ -131,6 +131,18 @@ export interface ResizeOptions {
   threshold?: number;
 }
 
+export interface TimelineHeaderCellProps {
+  content: ReactNode;
+  x: number;
+  index: number;
+}
+
+export interface TimelineSidebarRowProps {
+  category: CategoryRow;
+  level: number;
+  currentIndex: number;
+}
+
 export interface TimelineProps extends TimelineEventHandlers, TimelineItemEventHandlers {
   categories: CategoryRow[];
   cols: number;
@@ -144,6 +156,10 @@ export interface TimelineProps extends TimelineEventHandlers, TimelineItemEventH
   drag?: DragOptions;
   resize?: ResizeOptions;
   onItemsChange?: (items: TimelineItemData[]) => void;
+  headerCellComponent?: ComponentType<TimelineHeaderCellProps>;
+  sidebarRowComponent?: ComponentType<TimelineSidebarRowProps>;
+  backgroundComponent?: ComponentType;
+  cornerComponent?: ComponentType;
 }
 
 export interface TimelineContentProps extends TimelineEventHandlers, TimelineItemEventHandlers {

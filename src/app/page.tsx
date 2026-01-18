@@ -102,6 +102,22 @@ export default function Home() {
           threshold: 12
         }}
         onItemsChange={timelineItems.setItems}
+        headerCellComponent={({ content, x, index }) => (
+          <div className='bg-red-500 h-20 flex items-center justify-center'>
+            {content}
+          </div>
+        )}
+        sidebarRowComponent={({ category, level, currentIndex }) => {
+          if (level === 0) {
+            return <div className='bg-blue-500 h-full flex items-center justify-center'>
+              {category.name}
+            </div>;
+        }
+
+        return <div className='bg-green-500 h-full flex items-center justify-center'>
+          {category.name}
+        </div>;
+      }}
       />
       <CreateItemDialog
         open={isCreateDialogOpen}

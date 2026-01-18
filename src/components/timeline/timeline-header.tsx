@@ -1,26 +1,20 @@
 import { useTimelineContext } from '@/components/timeline/timeline-context';
-import { ReactNode } from 'react';
+import { TimelineHeaderCellProps } from '@/components/timeline/types';
+import { ComponentType } from 'react';
 
-function TimelineColumn({
-  content,
-  width
-}: {
-  content: ReactNode;
-  width: number;
-}) {
+export function DefaultHeaderCell({ content }: TimelineHeaderCellProps) {
   return (
-    <div
-      style={{
-        width: width
-      }}
-      className='border-r border-b border-border p-2 text-foreground'
-    >
+    <div className='border-r border-b border-border p-2 text-foreground'>
       {content}
     </div>
   );
 }
 
-export default function TimelineHeader() {
+export default function TimelineHeader({
+  headerCellComponent: HeaderCellComponent = DefaultHeaderCell
+}: {
+  headerCellComponent?: ComponentType<TimelineHeaderCellProps>;
+}) {
   const { cols, columnWidth, timelineWidth, renderColumn } = useTimelineContext();
 
   return (
@@ -28,7 +22,9 @@ export default function TimelineHeader() {
       {Array.from({ length: cols }, (_, index) => {
         const x = (timelineWidth / cols) * index;
         return (
-          <TimelineColumn key={index} content={renderColumn(x, index)} width={columnWidth} />
+          <div key={index} style={{ width: columnWidth }}>
+            <HeaderCellComponent content={renderColumn(x, index)} x={x} index={index} />
+          </div>
         );
       })}
     </div>

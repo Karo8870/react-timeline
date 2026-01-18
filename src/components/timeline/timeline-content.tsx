@@ -1,4 +1,3 @@
-import TimelineBackground from '@/components/timeline/timeline-background';
 import { useTimelineContext } from '@/components/timeline/timeline-context';
 import { useRef } from 'react';
 import { ComponentType } from 'react';
@@ -21,6 +20,7 @@ export type {
 export default function TimelineContent({
   items = [],
   itemComponents = {},
+  backgroundComponent: BackgroundComponent,
   onMouseDown,
   onMouseUp,
   onMouseMove,
@@ -35,7 +35,7 @@ export default function TimelineContent({
   onItemTouchStart,
   onItemTouchEnd,
   onItemTouchMove
-}: TimelineContentProps) {
+}: TimelineContentProps & { backgroundComponent: ComponentType }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { rowHeight, columnWidth, cols, timelineWidth } = useTimelineContext();
 
@@ -66,7 +66,7 @@ export default function TimelineContent({
       {...mouseHandlers}
       {...touchHandlers}
     >
-      <TimelineBackground />
+      <BackgroundComponent />
       {items.map((item, index) => {
         const pixelX = item.x * scaleFactor;
         const pixelWidth = item.width * scaleFactor;
